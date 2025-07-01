@@ -19,13 +19,16 @@ router.post(
   handleInputErrors,
   ProjectController.createProject
 );
+
 router.get("/", ProjectController.getAllProjects);
+
 router.get(
   "/:id",
   param("id").isMongoId().withMessage("El ID no es válido"),
   handleInputErrors,
   ProjectController.getProjectById
 );
+
 router.put(
   "/:id",
   param("id").isMongoId().withMessage("El ID no es válido"),
@@ -40,6 +43,13 @@ router.put(
     .withMessage("La descripción del proyecto es obligatoria"),
   handleInputErrors,
   ProjectController.updateProject
+);
+
+router.delete(
+  "/:id",
+  param("id").isMongoId().withMessage("El ID no es válido"),
+  handleInputErrors,
+  ProjectController.deleteProject
 );
 
 export default router;
