@@ -9,6 +9,7 @@ export class ProjectController {
       res.send("El proyecto ha sido creado");
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: "Ocurrió un error" });
     }
   };
 
@@ -18,13 +19,14 @@ export class ProjectController {
       res.json(projects);
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: "Ocurrió un error" });
     }
   };
 
   static getProjectById = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-      const project = await Project.findById(id);
+      const project = await Project.findById(id).populate("tasks");
       if (!project) {
         const error = new Error("El proyecto no ha sido encontrado");
         res.status(404).json({ error: error.message });
@@ -33,22 +35,27 @@ export class ProjectController {
       res.json(project);
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: "Ocurrió un error" });
     }
   };
 
   static updateProject = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-      const project = await Project.findByIdAndUpdate(id, req.body);
+      const project = await Project.findById(id);
       if (!project) {
         const error = new Error("El proyecto no ha sido encontrado");
         res.status(404).json({ error: error.message });
         return;
       }
+      project.clientName = req.body.clientName;
+      project.projectName = req.body.projectName;
+      project.description = req.body.description;
       await project.save();
       res.send("El proyecto ha sido actualizado");
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: "Ocurrió un error" });
     }
   };
 
@@ -65,6 +72,7 @@ export class ProjectController {
       res.send("El proyecto ha sido eliminado");
     } catch (error) {
       console.log(error);
+      res.status(500).json({ error: "Ocurrió un error" });
     }
   };
 }
