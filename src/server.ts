@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import morgan from "morgan";
 import { connectDB } from "./config/db";
 import projectRoutes from "./routes/projectRoutes";
 import { corsConfig } from "./config/cors";
@@ -13,10 +14,10 @@ const server = express();
 
 server.use(cors(corsConfig));
 
-// Lecture JSON
+server.use(morgan("dev"));
+
 server.use(express.json());
 
-// Routes
 server.use("/api/projects", projectRoutes);
 
 export default server;
