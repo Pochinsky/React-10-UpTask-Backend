@@ -53,7 +53,7 @@ export class AuthController {
       // check if token exists
       const tokenExists = await Token.findOne({ token });
       if (!tokenExists) {
-        const error = new Error("Token no válido");
+        const error = new Error("Código no válido");
         res.status(404).json({ error: error.message });
         return;
       }
@@ -114,6 +114,45 @@ export class AuthController {
       }
 
       res.send("Autenticado");
+    } catch (error) {
+      res.status(500).json({ error: "Ocurrió un error" });
+    }
+  };
+
+  static requestConfirmationCode = async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+
+      // check if user exist
+      const user = await User.findOne({ email });
+      if (!user) {
+        const error = new Error("El usuario no está registrado");
+        res.status(404).json({ error: error.message });
+        return;
+      }
+
+      // check if user is confirmed
+      if (user.confirmed) {
+        const error = new Error("El usuario ya está confirmado");
+        res.status(403).json({ error: error.message });
+        return;
+      }
+
+      // generate token
+      const token = new Token();
+      token.token = generateToken();
+      token.user = user.id;
+
+      // send confirmation email
+      AuthEmail.sendConfirmationEmail({
+        email: user.email,
+        name: user.name,
+        token: token.token,
+      });
+
+      // save user and token
+      await Promise.allSettled([user.save(), token.save()]);
+      res.send("Se te ha enviado un nuevo código");
     } catch (error) {
       res.status(500).json({ error: "Ocurrió un error" });
     }
