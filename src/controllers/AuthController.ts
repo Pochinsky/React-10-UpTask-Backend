@@ -190,4 +190,48 @@ export class AuthController {
       res.status(500).json({ error: "Ocurrió un error" });
     }
   };
+
+  static validateToken = async (req: Request, res: Response) => {
+    try {
+      const { token } = req.body;
+
+      // check if token exists
+      const tokenExists = await Token.findOne({ token });
+      if (!tokenExists) {
+        const error = new Error("Código no válido");
+        res.status(404).json({ error: error.message });
+        return;
+      }
+
+      res.send("Código válido, establece tu nueva contraseña");
+    } catch (error) {
+      res.status(500).json({ error: "Ocurrió un error" });
+    }
+  };
+
+  static updatePasswordWithToken = async (req: Request, res: Response) => {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+
+      // check if token exists
+      const tokenExists = await Token.findOne({ token });
+      if (!tokenExists) {
+        const error = new Error("Código no válido");
+        res.status(404).json({ error: error.message });
+        return;
+      }
+
+      // hash password
+      const user = await User.findById(tokenExists.user);
+      user.password = await hashPassword(password);
+
+      // save user and delete token
+      await Promise.allSettled([user.save(), tokenExists.deleteOne()]);
+
+      res.send("La contraseña ha sido reestablecida");
+    } catch (error) {
+      res.status(500).json({ error: "Ocurrió un error" });
+    }
+  };
 }
