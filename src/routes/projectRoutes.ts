@@ -15,9 +15,10 @@ const router = Router();
  * =======================
  */
 
+router.use(authenticate);
+
 router.post(
   "/",
-  authenticate,
   body("projectName")
     .notEmpty()
     .withMessage("El nombre del proyecto es obligatorio"),
