@@ -237,4 +237,8 @@ export class AuthController {
       res.status(500).json({ error: "Ocurrió un error" });
     }
   };
+
+  static getUser = async (req: Request, res: Response) => {
+    res.json(req.user);
+  };
 }
