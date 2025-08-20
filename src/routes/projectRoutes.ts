@@ -5,13 +5,19 @@ import { TaskController } from "../controllers/TaskController";
 import { handleInputErrors } from "../middlewares/validation";
 import { projectExists } from "../middlewares/project";
 import { taskBelongsToProject, taskExists } from "../middlewares/task";
+import { authenticate } from "../middlewares/auth";
 
 const router = Router();
 
-/** Routes for projects */
+/**
+ * =======================
+ * Routes for projects
+ * =======================
+ */
 
 router.post(
   "/",
+  authenticate,
   body("projectName")
     .notEmpty()
     .withMessage("El nombre del proyecto es obligatorio"),
@@ -57,7 +63,11 @@ router.delete(
   ProjectController.deleteProject
 );
 
-/** Routes for tasks */
+/**
+ * =======================
+ * Routes for tasks
+ * =======================
+ * */
 
 router.param("projectId", projectExists);
 
