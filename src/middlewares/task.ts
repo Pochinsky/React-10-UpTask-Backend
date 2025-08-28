@@ -42,3 +42,16 @@ export function taskBelongsToProject(
   }
   next();
 }
+
+export function hasAuthorization(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (req.user.id.toString() !== req.project.manager.toString()) {
+    const error = new Error("La acción no es válida");
+    res.status(400).json({ error: error.message });
+    return;
+  }
+  next();
+}
