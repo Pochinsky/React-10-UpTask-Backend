@@ -29,7 +29,11 @@ export class TaskController {
 
   static getTaskById = async (req: Request, res: Response) => {
     try {
-      res.json(req.task);
+      const task = await Task.findById(req.task.id).populate({
+        path: "completedBy",
+        select: "id name email",
+      });
+      res.json(task);
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Ocurrió un error" });
